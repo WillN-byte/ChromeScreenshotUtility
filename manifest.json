@@ -4,6 +4,6 @@
     "version" : "0.0.1",
     "permissions": ["contextMenus", "activeTab", "downloads"],
     "background" : {
-        "service_worker": "menu.js"
+        "service_worker": "script.js"
     }
 }
