@@ -46,7 +46,7 @@ function testClick(data, tab){
       singlePage();
       break;
     case 'region':
-      selectRegion(tab);
+      selectRegion();
       break;
     default:
       console.log(data.menuItemId);
@@ -58,32 +58,42 @@ function testClick(data, tab){
 
 // don't hard code name; need a settings page
 function singlePage() {
+  let currentDate = new Date();
+
+  let date = (currentDate.getMonth() + 1) + 
+    "-" + (currentDate.getDate()) + "-" + (currentDate.getFullYear()) 
+      + " " + (currentDate.getHours() + "" + (currentDate.getMinutes())
+      + "" + (currentDate.getSeconds()));
+  console.log(date);
   chrome.tabs.captureVisibleTab(null, { format: "png" }, function(screenshotUrl) {
-    chrome.downloads.download({filename: "screenshot.png", url: screenshotUrl}, function(id){
+    chrome.downloads.download({filename: `screenshot ${date}.png`, url: screenshotUrl}, function(id){
       console.log("error" + id);
     });
 });
 }
 
-function selectRegion(tab) {
-  chrome.desktopCapture.chooseDesktopMedia(["tab"], tab, function(streamId) {
-    if (streamId) {
-      console.log("Success");
-      // var video = document.createElement("video");
-      // video.src = URL.createObjectURL(streamId);
-      // video.play();
+// here send a message so we can tell the content script to draw the canvas 
+function selectRegion() {
+    
+
+  // chrome.desktopCapture.chooseDesktopMedia(["tab"], tab, function(streamId) {
+  //   if (streamId) {
+  //     console.log("Success");
+  //     // var video = document.createElement("video");
+  //     // video.src = URL.createObjectURL(streamId);
+  //     // video.play();
   
-      // video.onloadedmetadata = function() {
-      //   var canvas = document.createElement("canvas");
-      //   canvas.width = video.videoWidth;
-      //   canvas.height = video.videoHeight;
-      //   canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+  //     // video.onloadedmetadata = function() {
+  //     //   var canvas = document.createElement("canvas");
+  //     //   canvas.width = video.videoWidth;
+  //     //   canvas.height = video.videoHeight;
+  //     //   canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
   
-      //   var screenshotUrl = canvas.toDataURL("image/png");
-      //   var image = new Image();
-      //   image.src = screenshotUrl;
-      //   document.body.appendChild(image);
-      // };
-    }
-  });
+  //     //   var screenshotUrl = canvas.toDataURL("image/png");
+  //     //   var image = new Image();
+  //     //   image.src = screenshotUrl;
+  //     //   document.body.appendChild(image);
+  //     // };
+  //   }
+  // });
 }
