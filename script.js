@@ -40,7 +40,7 @@ chrome.contextMenus.onClicked.addListener(testClick);
 
 
 function testClick(data, tab){
-
+  console.log(tab);
   switch (data.menuItemId) {
     case 'single':
       singlePage();
@@ -58,32 +58,32 @@ function testClick(data, tab){
 
 // don't hard code name; need a settings page
 function singlePage() {
-  chrome.tabs.captureVisibleTab(null, { format: "jpeg", quality: 100 }, function(screenshotUrl) {
-    chrome.downloads.download({filename: "test.jpeg", url: screenshotUrl}, function(id){
+  chrome.tabs.captureVisibleTab(null, { format: "png" }, function(screenshotUrl) {
+    chrome.downloads.download({filename: "screenshot.png", url: screenshotUrl}, function(id){
       console.log("error" + id);
     });
 });
 }
 
 function selectRegion(tab) {
-  // chrome.desktopCapture.chooseDesktopMedia(["tab"], null, function(streamId) {
-  //   if (streamId) {
-  //     console.log("Success");
-  //     var video = document.createElement("video");
-  //     video.src = URL.createObjectURL(streamId);
-  //     video.play();
+  chrome.desktopCapture.chooseDesktopMedia(["tab"], tab, function(streamId) {
+    if (streamId) {
+      console.log("Success");
+      // var video = document.createElement("video");
+      // video.src = URL.createObjectURL(streamId);
+      // video.play();
   
-  //     video.onloadedmetadata = function() {
-  //       var canvas = document.createElement("canvas");
-  //       canvas.width = video.videoWidth;
-  //       canvas.height = video.videoHeight;
-  //       canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+      // video.onloadedmetadata = function() {
+      //   var canvas = document.createElement("canvas");
+      //   canvas.width = video.videoWidth;
+      //   canvas.height = video.videoHeight;
+      //   canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
   
-  //       var screenshotUrl = canvas.toDataURL("image/png");
-  //       var image = new Image();
-  //       image.src = screenshotUrl;
-  //       document.body.appendChild(image);
-  //     };
-  //   }
-  // });
+      //   var screenshotUrl = canvas.toDataURL("image/png");
+      //   var image = new Image();
+      //   image.src = screenshotUrl;
+      //   document.body.appendChild(image);
+      // };
+    }
+  });
 }
