@@ -76,8 +76,8 @@ function singlePage() {
 });
 }
 
+// seems to not work on chrome:// sites
 // here send a message so we can tell the content script to draw the canvas 
 function selectRegion(tab) {
-  // chrome.tabs.sendMessage(tab.id, {message: "region screenshot"}, (response) =>{console.log("Done"); return true;})
-    
+      chrome.tabs.sendMessage(tab.id, {msg : "Hi from background"});
 }
