@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 
     if (message.requested === 'createCanvas') {
         let canvasParams = message.requested;
-    
+        
         // create canvas here 
         // also send the screenshot?
         sendResponse({msg : "Created Canvas"}, function (response){console.log(response);});
