@@ -57,8 +57,7 @@ function testClick(data, tab) {
 function getFileStamp() {
   let currentDate = new Date();
   let date =
-    currentDate.getMonth() +
-    1 +
+    (currentDate.getMonth() + 1) +
     '-' +
     currentDate.getDate() +
     '-' +
@@ -100,7 +99,7 @@ function selectRegion(tab) {
     },
     (response) => {
       if (response && response.message === 'success') {
-        console.log('it works');
+        console.log('Success Canvas was created');
       } else {
         console.log('Something went wrong');
       }
