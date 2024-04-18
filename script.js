@@ -79,5 +79,6 @@ function singlePage() {
 // seems to not work on chrome:// sites
 // here send a message so we can tell the content script to draw the canvas 
 function selectRegion(tab) {
-      chrome.tabs.sendMessage(tab.id, {msg : "Hi from background"});
+      chrome.tabs.sendMessage(tab.id, {createCanvas : {width: tab.width, height: tab.height}}, 
+        function(response) {console.log(response.msg)});
 }
