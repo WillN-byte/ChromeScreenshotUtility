@@ -14,7 +14,8 @@ function createCanvas(width, height) {
   canvas.height = height === null ? document.body.scrollHeight : height;
   canvas.style.top = '0px';
   canvas.style.position = "absolute";
-  canvas.style.zIndex = 999;
+  // so apperently stackoverflows topbar and left bar have a zindex that is greater than 999 so
+  canvas.style.zIndex = 999999999999;  
   canvas.style.WebkitUserSelect = "none";
   canvas.style.userSelect = "none";
   const body = document.getElementsByTagName("body")[0];
