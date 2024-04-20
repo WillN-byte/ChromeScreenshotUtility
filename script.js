@@ -43,10 +43,10 @@ function testClick(data, tab) {
       visiblePage();
       break;
     case 'regionPaged':
-      selectRegion(tab, false);
+      selectRegion(tab, true);
       break;
     case 'region':
-      selectRegion(tab, true);
+      selectRegion(tab, false);
       break;
     default:
       console.log(data.menuItemId);
@@ -92,11 +92,11 @@ function visiblePage() {
 
 // seems to not work on chrome:// sites
 // here send a message so we can tell the content script to draw the canvas
-function selectRegion(tab, usetabHeight) {
+function selectRegion(tab, paged) {
   chrome.tabs.sendMessage(
     tab.id,
     {
-      createCanvas: { width: tab.width, height: (usetabHeight) ? tab.height : null },
+      createCanvas: { width: tab.width, height: tab.height, isPaged : paged },
     },
     (response) => {
       if (response && response.message === 'success') {

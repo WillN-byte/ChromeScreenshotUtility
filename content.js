@@ -6,12 +6,18 @@ console.log("Content Script ran");
 // the canvas needs to be created when paged region or region message is sent
 // the only difference is that paged region uses the the entire documents height
 
-function createCanvas(width, height) {
+function createCanvas(params) {
   const canvas = document.createElement("canvas");
 
   canvas.id = "my-canvas";
-  canvas.width = width;
-  canvas.height = height === null ? document.body.scrollHeight : height;
+  canvas.width = params.width;
+
+  if (params.isPaged && params.height < document.body.scrollHeight) {
+    canvas.height = document.body.scrollHeight;
+  } else {
+    canvas.height = params.height;
+  }
+
   canvas.style.top = '0px';
   canvas.style.position = "absolute";
   // so apperently stackoverflows topbar and left bar have a zindex that is greater than 999 so
@@ -20,7 +26,7 @@ function createCanvas(width, height) {
   canvas.style.userSelect = "none";
   const body = document.getElementsByTagName("body")[0];
   body.appendChild(canvas);
-  canvas.tabIndex = "1";
+  // canvas.tabIndex = "1";
 
   // Some optional drawings.
   const ctx = canvas.getContext("2d");
@@ -68,7 +74,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     // Your canvas creation logic here
     // Assuming canvas creation is successful
 
-    createCanvas(param.width, param.height);
+    createCanvas(param);
     //response should be the image?
     sendResponse({ message: "success" });
   }
