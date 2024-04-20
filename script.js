@@ -6,9 +6,9 @@ chrome.runtime.onInstalled.addListener(function () {
   });
 
   chrome.contextMenus.create({
-    title: 'Single Webpage',
+    title: 'Visible Webpage',
     contexts: ['all'],
-    id: 'single',
+    id: 'visible',
     parentId: root,
   });
 
@@ -39,12 +39,14 @@ chrome.contextMenus.onClicked.addListener(testClick);
 function testClick(data, tab) {
   console.log(tab);
   switch (data.menuItemId) {
-    case 'single':
-      singlePage();
+    case 'visible':
+      visiblePage();
+      break;
+    case 'regionPaged':
+      selectRegion(tab, false);
       break;
     case 'region':
-      //console.log('runs');
-      selectRegion(tab);
+      selectRegion(tab, true);
       break;
     default:
       console.log(data.menuItemId);
@@ -73,7 +75,7 @@ function getFileStamp() {
 }
 
 // don't hard code name; need a settings page
-function singlePage() {
+function visiblePage() {
   chrome.tabs.captureVisibleTab(
     null,
     { format: 'png' },
@@ -90,12 +92,11 @@ function singlePage() {
 
 // seems to not work on chrome:// sites
 // here send a message so we can tell the content script to draw the canvas
-function selectRegion(tab) {
-  console.log('works');
+function selectRegion(tab, usetabHeight) {
   chrome.tabs.sendMessage(
     tab.id,
     {
-      createCanvas: { width: tab.width, height: tab.height },
+      createCanvas: { width: tab.width, height: (usetabHeight) ? tab.height : null },
     },
     (response) => {
       if (response && response.message === 'success') {
