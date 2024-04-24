@@ -22,20 +22,29 @@ function createCanvas(params) {
   canvas.style.position = "absolute";
   // so apperently stackoverflows topbar and left bar have a zindex that is greater than 999 so
   canvas.style.zIndex = 999999999999;  
-  canvas.style.WebkitUserSelect = "none";
-  canvas.style.userSelect = "none";
+  
   const body = document.getElementsByTagName("body")[0];
   body.appendChild(canvas);
-  // canvas.tabIndex = "1";
 
-  // Some optional drawings.
+  // sets the background color for canvas
+  // to indicate to the user to select the region
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "rgba(250, 218, 221, 0.2)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // do an if else statement for
+  // paged region will just be a line that converts to a rectangle
+  drawRegion(canvas, params.isPaged);
+  
+}
+
+
+function drawRegion(canvas) {
   let x = 0;
   let y = 0;
   let isdrawing = false;
+
+  let ctx = canvas.getContext("2d");
 
   // this begins drawing the rectangle
   // sets the top left to x,y
@@ -51,8 +60,12 @@ function createCanvas(params) {
       let rectHeight = e.offsetY - y;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = "rgba(250, 218, 221, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.strokeRect(x, y, rectWidth, rectHeight);
+      
 
       console.log(`Rectangle is ${rectWidth} ${rectHeight}`);
     }
