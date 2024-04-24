@@ -35,6 +35,7 @@ function createCanvas(params) {
   // do an if else statement for
   // paged region will just be a line that converts to a rectangle
   drawRegion(canvas, params.isPaged);
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // need to clear the canvas after we have the region
   
 }
 
@@ -66,7 +67,8 @@ function drawRegion(canvas) {
 
       ctx.strokeRect(x, y, rectWidth, rectHeight);
       
-
+      // for paged region we keep the width, x, y coordinates but height becomes the entire page
+      // region we keep all to crop
       console.log(`Rectangle is ${rectWidth} ${rectHeight}`);
     }
   };
