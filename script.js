@@ -43,7 +43,7 @@ function testClick(data, tab) {
       visiblePage();
       break;
     case "paged":
-      captureAndStitch();
+      capturePage(tab);
       break;
     case "regionPaged":
       selectRegion(tab, true);
@@ -94,40 +94,23 @@ function visiblePage() {
   );
 }
 
-function wholePage() {
-  chrome.tabs.captureVisibleTab(null, { format: "png" }, function (dataUrl) {
-    var canvas = this.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = this.body.scrollHeight;
-    var ctx = canvas.getContext("2d");
-    var img = document.createElement("img");
-    img.src = dataUrl;
-    img.onload = function () {
-      ctx.drawImage(img, 0, 0, img.width, img.height);
-      chrome.tabs.executeScript(
-        null,
-        { code: "window.scrollTo(0, document.body.scrollHeight)" },
-        function () {
-          setTimeout(function () {
-            chrome.tabs.captureVisibleTab(
-              null,
-              { format: "png" },
-              function (dataUrl) {
-                var img2 = new document.createElement("img");
-                img2.src = dataUrl;
-                img2.onload = function () {
-                  ctx.drawImage(img2, 0, img.height, img2.width, img2.height);
-                  var finalDataUrl = canvas.toDataURL("image/png");
-                  // Use finalDataUrl as needed
-                  console.log(finalDataUrl);
-                };
-              }
-            );
-          }, 500);
-        }
-      );
-    };
-  });
+// Background script
+
+// Function to send a message to the content script
+function capturePage(tab) {
+  chrome.tabs.sendMessage(
+    tab.id,
+    {
+      capturePageContent: {},
+    },
+    (response) => {
+      if (response && response.message === "success2") {
+        console.log("Success Canvas was created");
+      } else {
+        console.log("Something went wrong");
+      }
+    }
+  );
 }
 
 // seems to not work on chrome:// sites
@@ -148,74 +131,41 @@ function selectRegion(tab, paged) {
   );
 }
 
-function captureAndStitch() {
-  chrome.tabs.captureVisibleTab(
-    null,
-    { format: "png" },
-    function (firstDataUrl) {
-      var img = new Image();
-      img.src = firstDataUrl;
-      img.onload = function () {
-        var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = document.body.scrollHeight;
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-
-        // Function to capture and stitch additional screenshots
-        function captureAndStitchRecursive(scrollPosition) {
-          chrome.tabs.executeScript(
-            null,
-            { code: "window.scrollTo(0, " + scrollPosition + ")" },
-            function () {
-              setTimeout(function () {
-                chrome.tabs.captureVisibleTab(
-                  null,
-                  { format: "png" },
-                  function (dataUrl) {
-                    var img = new Image();
-                    img.src = dataUrl;
-                    img.onload = function () {
-                      ctx.drawImage(
-                        img,
-                        0,
-                        scrollPosition,
-                        img.width,
-                        img.height
-                      );
-                      if (scrollPosition < document.body.scrollHeight) {
-                        captureAndStitchRecursive(scrollPosition + img.height);
-                      } else {
-                        var finalDataUrl = canvas.toDataURL("image/png");
-                        // Download the stitched image
-                        chrome.downloads.download(
-                          { filename: "stitched_image.png", url: finalDataUrl },
-                          function (downloadId) {
-                            if (chrome.runtime.lastError) {
-                              console.error(
-                                "Error downloading image:",
-                                chrome.runtime.lastError.message
-                              );
-                            } else {
-                              console.log(
-                                "Image downloaded successfully with ID:",
-                                downloadId
-                              );
-                            }
-                          }
-                        );
-                      }
-                    };
-                  }
-                );
-              }, 500);
-            }
-          );
-        }
-
-        // Start capturing and stitching additional screenshots
-        captureAndStitchRecursive(img.height);
-      };
+function captureAndStitch(tab) {
+  chrome.tabs.sendMessage(
+    tab.id,
+    {
+      downloadPage: { url: tab.dataUrl },
+    },
+    (response) => {
+      if (response && response.message === "success2") {
+        console.log("Success Page was created");
+      } else {
+        console.log("Something went wrong");
+      }
     }
   );
 }
+
+// Listen for messages from the content script
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.dataUrl) {
+    // Handle the captured data URL
+    var dataUrl = message.dataUrl;
+    // Process or save the captured data as needed
+    // For example, initiate a download of the captured image
+    chrome.downloads.download(
+      { filename: "captured_page.png", url: dataUrl },
+      function (downloadId) {
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Error downloading image:",
+            chrome.runtime.lastError.message
+          );
+        } else {
+          console.log("Image downloaded successfully with ID:", downloadId);
+        }
+      }
+    );
+  }
+});
