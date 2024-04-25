@@ -71,7 +71,7 @@ function drawRegion(canvas) {
     if (isdrawing === true) {
       x = 0;
       y = 0;
-      isdrawing = false;
+      isdrawing = false; // leave immideately
     }
   };
 }
@@ -101,7 +101,7 @@ function capturePageContent() {
   canvas.height = document.body.scrollHeight;
   
   
-    html2canvas(document.body, {allowTaint: true, foreignObjectRendering :true}).then(function(canvas) {
+    html2canvas(document.body, {allowTaint: true, foreignObjectRendering :true, useCors: true}).then(function(canvas) {
         let dataURL = canvas.toDataURL("image/png", 1.0);
         chrome.runtime.sendMessage({ dataUrl: dataURL });
         console.log(dataURL);
