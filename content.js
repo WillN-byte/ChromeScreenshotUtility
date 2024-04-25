@@ -1,5 +1,3 @@
-import html2canvas from "html2canvas";
-console.log("Content Script ran");
 // need to send recieve a message to put the canvas on screen
 
 // add function that creates the canvas
@@ -98,19 +96,21 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 // Capture the entire page content
 function capturePageContent() {
   // Create a canvas to capture the entire page
-  var canvas = document.createElement("canvas");
+  let canvas = document.createElement("canvas");
   canvas.width = document.body.scrollWidth;
   canvas.height = document.body.scrollHeight;
-  const body = document.getElementsByTagName("body")[0];
-  html2canvas(body).then(function (canvas) {
-    document.body.appendChild(canvas);
-  });
+
+    html2canvas(document.body).then(function(canvas) {
+        let dataURL = canvas.toDataURL("image/png", 1.0);
+        console.log(dataURL);
+        return true;
+      });
 
   // Draw the entire page onto the canvas
   //ctx.drawWindow(window, 0, 0, canvas.width, canvas.height, "rgb(255,255,255)");
 
   // Convert the canvas content to a data URL
-  var dataUrl = canvas.toDataURL("image/png");
+  let dataUrl = canvas.toDataURL("image/png");
 
   // Send the captured data URL back to the background script
   chrome.runtime.sendMessage({ dataUrl: dataUrl });

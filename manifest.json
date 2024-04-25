@@ -8,8 +8,7 @@
     "activeTab",
     "downloads",
     "desktopCapture",
-    "scripting",
-    "<all_urls>"
+    "scripting"
   ],
   "background": {
     "service_worker": "script.js"

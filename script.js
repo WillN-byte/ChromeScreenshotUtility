@@ -149,9 +149,9 @@ function captureAndStitch(tab) {
 
 // Listen for messages from the content script
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.dataUrl) {
+  if (message && message.dataUrl) {
     // Handle the captured data URL
-    var dataUrl = message.dataUrl;
+    let dataUrl = message.dataUrl;
     // Process or save the captured data as needed
     // For example, initiate a download of the captured image
     chrome.downloads.download(
