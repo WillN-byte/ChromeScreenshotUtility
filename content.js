@@ -18,11 +18,11 @@ function createCanvas(params) {
     canvas.height = params.height;
   }
 
-  canvas.style.top = '0px';
+  canvas.style.top = "0px";
   canvas.style.position = "absolute";
   // so apperently stackoverflows topbar and left bar have a zindex that is greater than 999 so
-  canvas.style.zIndex = 999999999999;  
-  
+  canvas.style.zIndex = 999999999999;
+
   const body = document.getElementsByTagName("body")[0];
   body.appendChild(canvas);
 
@@ -35,9 +35,7 @@ function createCanvas(params) {
   // do an if else statement for
   // paged region will just be a line that converts to a rectangle
   drawRegion(canvas, params.isPaged);
-  
 }
-
 
 function drawRegion(canvas) {
   let x = 0;
@@ -60,12 +58,11 @@ function drawRegion(canvas) {
       let rectHeight = e.offsetY - y;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       ctx.fillStyle = "rgba(250, 218, 221, 0.2)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.strokeRect(x, y, rectWidth, rectHeight);
-      
 
       console.log(`Rectangle is ${rectWidth} ${rectHeight}`);
     }
