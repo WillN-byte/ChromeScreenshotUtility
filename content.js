@@ -5,9 +5,9 @@
 // the only difference is that paged region uses the the entire documents height
 
 function createCanvas(params) {
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
 
-  canvas.id = "my-canvas";
+  canvas.id = 'my-canvas';
   canvas.width = params.width;
 
   if (params.isPaged && params.height < document.body.scrollHeight) {
@@ -16,18 +16,18 @@ function createCanvas(params) {
     canvas.height = params.height;
   }
 
-  canvas.style.top = "0px";
-  canvas.style.position = "absolute";
+  canvas.style.top = '0px';
+  canvas.style.position = 'absolute';
   // so apperently stackoverflows topbar and left bar have a zindex that is greater than 999 so
   canvas.style.zIndex = 999999999999;
 
-  const body = document.getElementsByTagName("body")[0];
+  const body = document.getElementsByTagName('body')[0];
   body.appendChild(canvas);
 
   // sets the background color for canvas
   // to indicate to the user to select the region
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "rgba(250, 218, 221, 0.2)";
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'rgba(250, 218, 221, 0.2)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // do an if else statement for
@@ -40,7 +40,7 @@ function drawRegion(canvas) {
   let y = 0;
   let isdrawing = false;
 
-  let ctx = canvas.getContext("2d");
+  let ctx = canvas.getContext('2d');
 
   // this begins drawing the rectangle
   // sets the top left to x,y
@@ -50,14 +50,16 @@ function drawRegion(canvas) {
     isdrawing = true;
   };
 
+  let rectWidth = 0;
+  let rectHeight = 0;
   canvas.onmousemove = (e) => {
     if (isdrawing === true) {
-      let rectWidth = e.offsetX - x;
-      let rectHeight = e.offsetY - y;
+      rectWidth = e.offsetX - x;
+      rectHeight = e.offsetY - y;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "rgba(250, 218, 221, 0.2)";
+      ctx.fillStyle = 'rgba(250, 218, 221, 0.2)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.strokeRect(x, y, rectWidth, rectHeight);
@@ -69,11 +71,29 @@ function drawRegion(canvas) {
   // mouse is no longer moving so this is the final
   canvas.onmouseup = (_) => {
     if (isdrawing === true) {
+      //ctx.drawImage(canvas, x, y, rectWidth, rectHeight, 0, 0);
+      html2canvas(document.body, {
+        allowTaint: true,
+        foreignObjectRendering: true,
+        canvas: canvas,
+        width: rectWidth,
+        height: rectHeight,
+        x: x,
+        y: y,
+        //useCors: true,
+      }).then(function (canvas) {
+        let dataURL = canvas.toDataURL('image/png', 1.0);
+        chrome.runtime.sendMessage({ dataUrl: dataURL });
+        console.log(dataURL);
+        return true;
+      });
       x = 0;
       y = 0;
+      canvas.parentNode.removeChild(canvas);
       isdrawing = false; // leave immideately
     }
   };
+  return true;
 }
 
 // in the listener draw the canvas?
@@ -84,11 +104,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
     createCanvas(param);
     //response should be the image?
-    sendResponse({ message: "success" });
+    sendResponse({ message: 'success' });
   }
   if (request.capturePageContent) {
     capturePageContent();
-    sendResponse({ message: "success2" });
+    sendResponse({ message: 'success2' });
   }
   return true;
 });
@@ -96,23 +116,25 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 // Capture the entire page content
 function capturePageContent() {
   // Create a canvas to capture the entire page
-  let canvas = document.createElement("canvas");
+  let canvas = document.createElement('canvas');
   canvas.width = document.body.scrollWidth;
   canvas.height = document.body.scrollHeight;
-  
-  
-    html2canvas(document.body, {allowTaint: true, foreignObjectRendering :true, useCors: true}).then(function(canvas) {
-        let dataURL = canvas.toDataURL("image/png", 1.0);
-        chrome.runtime.sendMessage({ dataUrl: dataURL });
-        console.log(dataURL);
-        return true;
-      });
+
+  html2canvas(document.body, {
+    allowTaint: true,
+    foreignObjectRendering: true,
+    useCors: true,
+  }).then(function (canvas) {
+    let dataURL = canvas.toDataURL('image/png', 1.0);
+    chrome.runtime.sendMessage({ dataUrl: dataURL });
+    console.log(dataURL);
+    return true;
+  });
 
   // Draw the entire page onto the canvas
   //ctx.drawWindow(window, 0, 0, canvas.width, canvas.height, "rgb(255,255,255)");
 
   // Convert the canvas content to a data URL
- 
 
   // Send the captured data URL back to the background script
   // chrome.runtime.sendMessage({ dataUrl: dataUrl });
