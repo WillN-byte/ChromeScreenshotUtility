@@ -99,9 +99,11 @@ function capturePageContent() {
   let canvas = document.createElement("canvas");
   canvas.width = document.body.scrollWidth;
   canvas.height = document.body.scrollHeight;
-
-    html2canvas(document.body).then(function(canvas) {
+  
+  
+    html2canvas(document.body, {allowTaint: true, foreignObjectRendering :true}).then(function(canvas) {
         let dataURL = canvas.toDataURL("image/png", 1.0);
+        chrome.runtime.sendMessage({ dataUrl: dataURL });
         console.log(dataURL);
         return true;
       });
@@ -110,8 +112,8 @@ function capturePageContent() {
   //ctx.drawWindow(window, 0, 0, canvas.width, canvas.height, "rgb(255,255,255)");
 
   // Convert the canvas content to a data URL
-  let dataUrl = canvas.toDataURL("image/png");
+ 
 
   // Send the captured data URL back to the background script
-  chrome.runtime.sendMessage({ dataUrl: dataUrl });
+  // chrome.runtime.sendMessage({ dataUrl: dataUrl });
 }
