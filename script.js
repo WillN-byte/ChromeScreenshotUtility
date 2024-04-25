@@ -155,7 +155,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     // Process or save the captured data as needed
     // For example, initiate a download of the captured image
     chrome.downloads.download(
-      { filename: "captured_page.png", url: dataUrl },
+      { filename: getFileStamp(), url: dataUrl },
       function (downloadId) {
         if (chrome.runtime.lastError) {
           console.error(
