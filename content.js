@@ -43,12 +43,19 @@ function drawRegion(canvas) {
 
   let ctx = canvas.getContext('2d');
 
+  let initX = -1;
+  let initY = -1;
   // this begins drawing the rectangle
   // sets the top left to x,y
   canvas.onmousedown = (e) => {
     x = e.offsetX;
     y = e.offsetY;
     isdrawing = true;
+
+    if (initX == -1 && initY == -1) {
+      initX = x;
+      initY = y;
+    }
   };
 
   let rectWidth = 0;
@@ -63,7 +70,7 @@ function drawRegion(canvas) {
       ctx.fillStyle = 'rgba(250, 218, 221, 0.2)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.strokeRect(x, y, rectWidth, rectHeight);
+      ctx.strokeRect(initX, initY, rectWidth, rectHeight);
 
       console.log(`Rectangle is ${rectWidth} ${rectHeight}`);
     }
@@ -77,20 +84,36 @@ function drawRegion(canvas) {
         scrollY: -window.scrollY, //need this to get the correct height
         allowTaint: true,
         foreignObjectRendering: true,
-        // canvas: canvas,
-        width: rectWidth + e.offsetX,
-        height: rectHeight + e.offsetY,
-        x: x,
-        y: y,
-        //useCors: true,
       }).then(function (canvas) {
+
         let dataURL = canvas.toDataURL('image/png', 1.0);
-        chrome.runtime.sendMessage({ dataUrl: dataURL });
-        console.log(dataURL);
+        // console.log(dataURL);
+        let regionImage = new Image();
+        regionImage.src = dataURL;
+
+        regionImage.onload = () => {
+          let resizeCanvas = document.createElement("canvas");
+
+          resizeCanvas.width = rectWidth;
+          resizeCanvas.height = rectHeight;
+
+          let rctx = resizeCanvas.getContext("2d");
+          rctx.drawImage(regionImage, rectWidth + x, rectHeight - y, rectWidth, rectHeight, 0 , 0, rectWidth, rectHeight);
+
+          let url = resizeCanvas.toDataURL('image/png', 1.0);
+          console.log(url);
+          // chrome.runtime.sendMessage({ dataUrl: url });
+
+        };
+
+        // chrome.runtime.sendMessage({ dataUrl: dataURL });
+        // console.log(dataURL);
         return true;
       });
+
       x = 0;
       y = 0;
+      initX = initY = -1;
       canvas.parentNode.removeChild(canvas);
       isdrawing = false; // leave immideately
     }
