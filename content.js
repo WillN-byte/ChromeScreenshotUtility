@@ -20,6 +20,7 @@ function createCanvas(params) {
   canvas.style.position = 'absolute';
   // so apperently stackoverflows topbar and left bar have a zindex that is greater than 999 so
   canvas.style.zIndex = 999999999999;
+  canvas.setAttribute('data-html2canvas-ignore','true');
 
   const body = document.getElementsByTagName('body')[0];
   body.appendChild(canvas);
@@ -69,15 +70,16 @@ function drawRegion(canvas) {
   };
 
   // mouse is no longer moving so this is the final
-  canvas.onmouseup = (_) => {
+  canvas.onmouseup = (e) => {
     if (isdrawing === true) {
       //ctx.drawImage(canvas, x, y, rectWidth, rectHeight, 0, 0);
       html2canvas(document.body, {
+        scrollY: -window.scrollY, //need this to get the correct height
         allowTaint: true,
         foreignObjectRendering: true,
-        canvas: canvas,
-        width: rectWidth,
-        height: rectHeight,
+        // canvas: canvas,
+        width: rectWidth + e.offsetX,
+        height: rectHeight + e.offsetY,
         x: x,
         y: y,
         //useCors: true,
