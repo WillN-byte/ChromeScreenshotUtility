@@ -68,7 +68,7 @@ function drawRegion(canvas, isPaged) {
     }
   };
   // mouse is no longer moving so this is the final
-  canvas.onmouseup = (e) => {
+  canvas.onmouseup = (_) => {
     if (isdrawing === true) {
       //ctx.drawImage(canvas, x, y, rectWidth, rectHeight, 0, 0);
       html2canvas(document.body, {
@@ -77,17 +77,17 @@ function drawRegion(canvas, isPaged) {
       }).then(function (cropCanvas) {
         let destCanvas = document.createElement("canvas");
         destCanvas.width = rectWidth;
-        destCanvas.height = rectHeight;
+        destCanvas.height = isPaged ? canvas.height : rectHeight;
         destCanvas.getContext("2d").drawImage(
           cropCanvas,
           x,
-          y,
+          (isPaged) ? 0 : y,
           rectWidth,
-          rectHeight, // source rect with content to crop
+          (isPaged) ? canvas.height: rectHeight, // source rect with content to crop
           0,
           0,
           rectWidth,
-          rectHeight
+          (isPaged) ? canvas.height : rectHeight
         );
         console.log(x);
         console.log(y);
