@@ -1,3 +1,4 @@
+// creates the right click menu items once 
 chrome.runtime.onInstalled.addListener(function () {
   let root = chrome.contextMenus.create({
     title: "Take Screenshot",
@@ -34,9 +35,9 @@ chrome.runtime.onInstalled.addListener(function () {
   });
 });
 
-chrome.contextMenus.onClicked.addListener(testClick);
+chrome.contextMenus.onClicked.addListener(menuClickListener);
 
-function testClick(data, tab) {
+function menuClickListener(data, tab) {
   console.log(tab);
   switch (data.menuItemId) {
     case "visible":
@@ -59,6 +60,7 @@ function testClick(data, tab) {
   console.log("pressed");
 }
 
+// generate a unique timestamp for the images
 function getFileStamp() {
   let currentDate = new Date();
   let date =
@@ -78,7 +80,8 @@ function getFileStamp() {
   return `screenshot ${date}.png`;
 }
 
-// don't hard code name; need a settings page
+// we can only capture the current tab
+// bc chrome provides an api for it
 function visiblePage() {
   chrome.tabs.captureVisibleTab(
     null,
@@ -94,9 +97,9 @@ function visiblePage() {
   );
 }
 
-// Background script
 
 // Function to send a message to the content script
+// this will take a paged screenshot
 function capturePage(tab) {
   chrome.tabs.sendMessage(
     tab.id,
@@ -119,7 +122,7 @@ function selectRegion(tab, paged) {
   chrome.tabs.sendMessage(
     tab.id,
     {
-      createCanvas: { width: tab.width, height: tab.height, isPaged: paged },
+      createCanvas: { width: tab.width, isPaged: paged },
     },
     (response) => {
       if (response && response.message === "success") {
@@ -131,21 +134,6 @@ function selectRegion(tab, paged) {
   );
 }
 
-function captureAndStitch(tab) {
-  chrome.tabs.sendMessage(
-    tab.id,
-    {
-      downloadPage: { url: tab.dataUrl },
-    },
-    (response) => {
-      if (response && response.message === "success2") {
-        console.log("Success Page was created");
-      } else {
-        console.log("Something went wrong");
-      }
-    }
-  );
-}
 
 // Listen for messages from the content script
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
