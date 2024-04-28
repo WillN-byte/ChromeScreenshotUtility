@@ -1,14 +1,23 @@
 {
-    "manifest_version" : 3,
-    "name": "Chrome Screenshot Utility",
-    "version" : "0.0.1",
-    "description" : "A simple screenshot tool for Chrome",
-    "permissions": ["contextMenus", "activeTab", "downloads", "desktopCapture", "scripting"],
-    "background" : {
-        "service_worker": "script.js"
-    },
-    "content_scripts":[{
-        "matches" : ["<all_urls>"],
-        "js" : ["content.js"]
-    }]
+  "manifest_version": 3,
+  "name": "Chrome Screenshot Utility",
+  "version": "0.0.1",
+  "description": "A simple screenshot tool for Chrome",
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "downloads",
+    "desktopCapture",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "script.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js", "html2canvas.js"]
+    }
+  ],
+  "host_permissions": ["<all_urls>"]
 }
